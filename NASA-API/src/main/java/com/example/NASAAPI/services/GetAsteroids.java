@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,24 +52,8 @@ public class GetAsteroids {
             if(nearEarthObjects.get(key) instanceof JSONArray){
                 JSONArray asteroidsByDate = nearEarthObjects.getJSONArray(key);
                 for(int idx=0; idx<asteroidsByDate.length();idx++){
-                    JSONObject asteroid = asteroidsByDate.getJSONObject(idx);Asteroid tempAsteroid = new Asteroid();
-                    tempAsteroid.setId(asteroid.getString("id"));
-                    tempAsteroid.setName(asteroid.getString("name"));
-                    tempAsteroid.setAbsoluteMagnitudeH(asteroid.getBigDecimal("absolute_magnitude_h"));
-                    tempAsteroid.setDiameterMin(asteroid.getJSONObject("estimated_diameter").getJSONObject("meters").getBigDecimal("estimated_diameter_min"));
-                    tempAsteroid.setDiameterMax(asteroid.getJSONObject("estimated_diameter").getJSONObject("meters").getBigDecimal("estimated_diameter_max"));
-                    tempAsteroid.setIsPotentiallyHazardousAsteroid(asteroid.getBoolean("is_potentially_hazardous_asteroid"));
-                    List<CloseApproachData> closeApproachDataList = new ArrayList<>();
-                    JSONArray resultCloseApproachData = asteroid.getJSONArray("close_approach_data");
-                    for(int index=0; index<resultCloseApproachData.length();index++){
-                        CloseApproachData tempCloseApproachData = new CloseApproachData();
-                        tempCloseApproachData.setCloseApproachDateFull(resultCloseApproachData.getJSONObject(index).getString("close_approach_date_full"));
-                        tempCloseApproachData.setMissDistance(resultCloseApproachData.getJSONObject(index).getJSONObject("miss_distance").getBigDecimal("kilometers"));
-                        tempCloseApproachData.setRelativeVelocity(resultCloseApproachData.getJSONObject(index).getJSONObject("relative_velocity").getBigDecimal("kilometers_per_hour"));
-                        closeApproachDataList.add(tempCloseApproachData);
-                    }
-                    tempAsteroid.setCloseApproachData(closeApproachDataList);
-                    asteroids.add(tempAsteroid);
+                    JSONObject asteroid = asteroidsByDate.getJSONObject(idx);
+                    asteroids.add(ParseAsteroidData(asteroid));
                 }
             }
 
@@ -81,5 +66,33 @@ public class GetAsteroids {
                 .limit(10)
                 .collect(Collectors.toList());
         return asteroids;
+    }
+
+    public Asteroid getSpecificAsteroid(String asteroidId){
+        String NasaApiUrl = String.format("https://api.nasa.gov/neo/rest/v1/neo/%s?api_key=%s",asteroidId,privateKey);
+        ResponseEntity<String> resultApi =
+                restTemplate.getForEntity(NasaApiUrl , String.class);
+        JSONObject result = new JSONObject(resultApi.getBody());
+        return ParseAsteroidData(result);
+    }
+    private Asteroid ParseAsteroidData(JSONObject asteroid){
+        Asteroid tempAsteroid = new Asteroid();
+        tempAsteroid.setId(asteroid.getString("id"));
+        tempAsteroid.setName(asteroid.getString("name"));
+        tempAsteroid.setAbsoluteMagnitudeH(asteroid.getBigDecimal("absolute_magnitude_h"));
+        tempAsteroid.setDiameterMin(asteroid.getJSONObject("estimated_diameter").getJSONObject("meters").getBigDecimal("estimated_diameter_min"));
+        tempAsteroid.setDiameterMax(asteroid.getJSONObject("estimated_diameter").getJSONObject("meters").getBigDecimal("estimated_diameter_max"));
+        tempAsteroid.setIsPotentiallyHazardousAsteroid(asteroid.getBoolean("is_potentially_hazardous_asteroid"));
+        List<CloseApproachData> closeApproachDataList = new ArrayList<>();
+        JSONArray resultCloseApproachData = asteroid.getJSONArray("close_approach_data");
+        for(int index=0; index<resultCloseApproachData.length();index++){
+            CloseApproachData tempCloseApproachData = new CloseApproachData();
+            tempCloseApproachData.setCloseApproachDateFull(resultCloseApproachData.getJSONObject(index).getString("close_approach_date_full"));
+            tempCloseApproachData.setMissDistance(resultCloseApproachData.getJSONObject(index).getJSONObject("miss_distance").getBigDecimal("kilometers"));
+            tempCloseApproachData.setRelativeVelocity(resultCloseApproachData.getJSONObject(index).getJSONObject("relative_velocity").getBigDecimal("kilometers_per_hour"));
+            closeApproachDataList.add(tempCloseApproachData);
+        }
+        tempAsteroid.setCloseApproachData(closeApproachDataList);
+        return tempAsteroid;
     }
 }

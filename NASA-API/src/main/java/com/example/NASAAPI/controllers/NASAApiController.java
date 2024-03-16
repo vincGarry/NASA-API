@@ -37,4 +37,18 @@ public class NASAApiController {
         MDC.clear();
         return ResponseEntity.ok().body(getAsteroidsTenClosestAsteroids);
     }
+    @PostMapping("/getSpecificAsteroidById")
+    @ApiResponses(
+            @ApiResponse(
+                    responseCode = "200", description = "Success"))
+    public ResponseEntity<Asteroid> getSpecificAsteroidById(@RequestBody String asteroidId) {
+        Asteroid result = new Asteroid();
+        try{
+            result = getAsteroids.getSpecificAsteroid(asteroidId);
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+        MDC.clear();
+        return ResponseEntity.ok().body(result);
+    }
 }
