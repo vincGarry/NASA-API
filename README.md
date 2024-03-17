@@ -43,13 +43,45 @@ CREATE TABLE  IF NOT EXISTS tb_close_approach_data(
 ## Endpoint Documentation
 
 ### `/getTenClosestAsteroids`
-This **POST** endpoint will fetch ten closest asteroids data from NASA Open API from specific dates
+This **POST** endpoint will fetch ten closest asteroids data from NASA Open API by specific dates
 
 Request body(application/json):
 ```
 {
   "startDate": "2024-01-01",
   "endDate": "2024-01-02"
+}
+```
+Response:
+```
+
+  {
+    "name": "string",
+    "id": "string",
+    "diameterMin": 0,
+    "diameterMax": 0,
+    "isPotentiallyHazardousAsteroid": true,
+    "absoluteMagnitudeH": 0,
+    "closeApproachData": [
+      {
+        "closeApproachDate": "string",
+        "relativeVelocity": 0,
+        "missDistance": 0
+      }
+    ]
+  }
+]
+```
+
+### `/getTenClosestAsteroidsByDistance`
+This **POST** endpoint will fetch ten closest asteroids from NASA Open API by specific dates and minimum distance limit in kilometers
+
+Request body(application/json):
+```
+{
+  "startDate": "string",
+  "endDate": "string",
+  "distance": "string"
 }
 ```
 Response:
@@ -96,7 +128,7 @@ Response:
 }
 ```
 ### `/getTenClosestAsteroidAndSaveToDB`
-This **POST** endpoint will fetch ten closest asteroids data from NASA Open API from specific dates while also saving it into the database
+This **POST** endpoint will fetch ten closest asteroids data from NASA Open API by specific dates while also saving it into the database
 
 Request body(application/json):
 ```
