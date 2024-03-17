@@ -13,19 +13,16 @@
         <th scope="col">Id</th>
         <th scope="col">Name</th>
         <th scope="col">Potentially Hazardous</th>
-        <th scope="col">Diameter Minimum (meter)</th>
-        <th scope="col">Diameter Maximum (meter)</th>
+        <th scope="col">Estimated Diameter (meter)</th>
         <th scope="col">Close Approach Data</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="asteroid,index: ${asteroids}">
-        <td th:text="${asteroid.id}"/>
+        <td><a th:href="@{'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr='+${asteroid.id}}" th:text="${asteroid.id}"/></td>
         <td th:text="${asteroid.name}"/>
         <td th:text="${asteroid.isPotentiallyHazardousAsteroid} ? 'YES' : 'NO'"/>
-        <td th:text="${asteroid.diameterMin}"/>
-        <td th:text="${asteroid.diameterMax}"/>
-        <td th:text="${closeApproachData[index.index]}"/>
+        <td th:text="${asteroid.diameterMin+ ' - ' +asteroid.diameterMax}"/>
         <td> <form method="post" th:action="@{/closeapproachdata}">
             <input type="hidden" name="asteroidName" id="asteroidName" th:value="${asteroid.name}" />
             <input type="hidden" name="closeApproachData" id="closeApproachData" th:value="${closeApproachData[index.index]}" />
@@ -34,5 +31,6 @@
     </tr>
     </tbody>
 </table>
+<a href="/"><button>Home</button></a>
 </body>
 </html>

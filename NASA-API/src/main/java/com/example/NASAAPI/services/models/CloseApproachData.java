@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 
 @Data
 public class CloseApproachData {
-    private String closeApproachDateFull;
+    private String closeApproachDate;
     private BigDecimal relativeVelocity;
     private BigDecimal missDistance;
 }

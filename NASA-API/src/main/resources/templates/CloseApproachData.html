@@ -17,12 +17,13 @@
     </thead>
     <tbody>
     <tr th:each="closeApproachData: ${closeApproachDataList}">
-        <td th:text="${closeApproachData.closeApproachDateFull}"/>
+        <td th:text="${closeApproachData.closeApproachDate}"/>
         <td th:text="${closeApproachData.relativeVelocity}"/>
         <td th:text="${closeApproachData.missDistance}"/>
     </tr>
     </tbody>
-    <button th:href="">Home</button>
 </table>
+<button onclick="history.back()">Go Back</button>
+<a href="/"><button>Home</button></a>
 </body>
 </html>

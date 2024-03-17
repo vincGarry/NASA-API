@@ -58,7 +58,12 @@ public class GetAsteroids {
             }
 
         }
-        asteroids= asteroids.stream()
+        asteroids= sortAsteroidByDistance(asteroids);
+        return asteroids;
+    }
+
+    public List<Asteroid> sortAsteroidByDistance(List<Asteroid> asteroids){
+        asteroids = asteroids.stream()
                 .sorted(((o1, o2) -> Double.compare(
                         o1.getCloseApproachData().stream().mapToDouble(o->o.getMissDistance().doubleValue()).min().getAsDouble(),
                         o2.getCloseApproachData().stream().mapToDouble(o->o.getMissDistance().doubleValue()).min().getAsDouble()
@@ -75,7 +80,7 @@ public class GetAsteroids {
         JSONObject result = new JSONObject(resultApi.getBody());
         return ParseAsteroidData(result);
     }
-    private Asteroid ParseAsteroidData(JSONObject asteroid){
+    public Asteroid ParseAsteroidData(JSONObject asteroid){
         Asteroid tempAsteroid = new Asteroid();
         tempAsteroid.setId(asteroid.getString("id"));
         tempAsteroid.setName(asteroid.getString("name"));
@@ -87,7 +92,7 @@ public class GetAsteroids {
         JSONArray resultCloseApproachData = asteroid.getJSONArray("close_approach_data");
         for(int index=0; index<resultCloseApproachData.length();index++){
             CloseApproachData tempCloseApproachData = new CloseApproachData();
-            tempCloseApproachData.setCloseApproachDateFull(resultCloseApproachData.getJSONObject(index).getString("close_approach_date_full"));
+            tempCloseApproachData.setCloseApproachDate(resultCloseApproachData.getJSONObject(index).getString("close_approach_date"));
             tempCloseApproachData.setMissDistance(resultCloseApproachData.getJSONObject(index).getJSONObject("miss_distance").getBigDecimal("kilometers"));
             tempCloseApproachData.setRelativeVelocity(resultCloseApproachData.getJSONObject(index).getJSONObject("relative_velocity").getBigDecimal("kilometers_per_hour"));
             closeApproachDataList.add(tempCloseApproachData);
