@@ -7,7 +7,6 @@ import com.example.NASAAPI.services.models.Asteroid;
 import com.example.NASAAPI.services.models.CloseApproachData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +35,8 @@ public class FrontendController {
         List<Asteroid> asteroids = new ArrayList<>();
         List<String> closeApproachDataJsonString = new ArrayList<>();
         try {
-            asteroids=getAsteroids.getTenClosestAsteroids(requestData.getStartDate(), requestData.getEndDate());
-            asteroids=getAsteroids.sortAsteroidByDistance(asteroids);
+            asteroids=getAsteroids.getTenClosestAsteroids(requestData.getStartDate(), requestData.getEndDate(),null);
+            asteroids=getAsteroids.sortAsteroidByDistance(asteroids,null);
             dataBaseProcess.InsertAsteroidsData(asteroids);
             closeApproachDataJsonString = parseCloseApproachDataToJSONString(asteroids);
         } catch (Exception e) {
@@ -54,7 +53,7 @@ public class FrontendController {
         List<String> closeApproachDataJsonString = new ArrayList<>();
         try {
             asteroids= dataBaseProcess.getAllAsteroidsFromDB();
-            asteroids= getAsteroids.sortAsteroidByDistance(asteroids);
+            asteroids= getAsteroids.sortAsteroidByDistance(asteroids,null);
             closeApproachDataJsonString = parseCloseApproachDataToJSONString(asteroids);
         } catch (Exception e) {
             e.printStackTrace();

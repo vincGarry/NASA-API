@@ -12,10 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -26,7 +23,7 @@ public class GetAsteroids {
     @Value("${nasa.api-key}")
     private String privateKey;
     private RestTemplate restTemplate = new RestTemplate();
-    public List<Asteroid> getTenClosestAsteroids(String startDate, String endDate) throws Exception {
+    public List<Asteroid> getTenClosestAsteroids(String startDate, String endDate,String distance) throws Exception {
         //Checking duration between 2 dates not exceeding 7 days following NASA Open API rules
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date firstDate = format.parse(startDate);
@@ -58,12 +55,21 @@ public class GetAsteroids {
             }
 
         }
-        asteroids= sortAsteroidByDistance(asteroids);
+        asteroids= sortAsteroidByDistance(asteroids,distance);
         return asteroids;
     }
 
-    public List<Asteroid> sortAsteroidByDistance(List<Asteroid> asteroids){
+    public List<Asteroid> sortAsteroidByDistance(List<Asteroid> asteroids, String distance){
+        BigDecimal distanceLimit = new BigDecimal(0);
+        if (Objects.nonNull(distance)){
+            distanceLimit = new BigDecimal(distance);
+        }
+        final BigDecimal limitMinimum = distanceLimit;
         asteroids = asteroids.stream()
+                .filter( asteroid -> new BigDecimal(
+                        asteroid.getCloseApproachData().stream().mapToDouble(o->o.getMissDistance().doubleValue()).min().getAsDouble()
+                        ).compareTo(limitMinimum)>=0
+                )
                 .sorted(((o1, o2) -> Double.compare(
                         o1.getCloseApproachData().stream().mapToDouble(o->o.getMissDistance().doubleValue()).min().getAsDouble(),
                         o2.getCloseApproachData().stream().mapToDouble(o->o.getMissDistance().doubleValue()).min().getAsDouble()
@@ -81,20 +87,21 @@ public class GetAsteroids {
         return ParseAsteroidData(result);
     }
     public Asteroid ParseAsteroidData(JSONObject asteroid){
+        //parsing API Response Data Into Objects
         Asteroid tempAsteroid = new Asteroid();
         tempAsteroid.setId(asteroid.getString("id"));
         tempAsteroid.setName(asteroid.getString("name"));
-        tempAsteroid.setAbsoluteMagnitudeH(asteroid.getBigDecimal("absolute_magnitude_h"));
-        tempAsteroid.setDiameterMin(asteroid.getJSONObject("estimated_diameter").getJSONObject("meters").getBigDecimal("estimated_diameter_min"));
-        tempAsteroid.setDiameterMax(asteroid.getJSONObject("estimated_diameter").getJSONObject("meters").getBigDecimal("estimated_diameter_max"));
+        tempAsteroid.setAbsoluteMagnitudeH(new BigDecimal(asteroid.getDouble("absolute_magnitude_h")));
+        tempAsteroid.setDiameterMin(new BigDecimal(asteroid.getJSONObject("estimated_diameter").getJSONObject("meters").getDouble("estimated_diameter_min")));
+        tempAsteroid.setDiameterMax(new BigDecimal(asteroid.getJSONObject("estimated_diameter").getJSONObject("meters").getDouble("estimated_diameter_max")));
         tempAsteroid.setIsPotentiallyHazardousAsteroid(asteroid.getBoolean("is_potentially_hazardous_asteroid"));
         List<CloseApproachData> closeApproachDataList = new ArrayList<>();
         JSONArray resultCloseApproachData = asteroid.getJSONArray("close_approach_data");
         for(int index=0; index<resultCloseApproachData.length();index++){
             CloseApproachData tempCloseApproachData = new CloseApproachData();
             tempCloseApproachData.setCloseApproachDate(resultCloseApproachData.getJSONObject(index).getString("close_approach_date"));
-            tempCloseApproachData.setMissDistance(resultCloseApproachData.getJSONObject(index).getJSONObject("miss_distance").getBigDecimal("kilometers"));
-            tempCloseApproachData.setRelativeVelocity(resultCloseApproachData.getJSONObject(index).getJSONObject("relative_velocity").getBigDecimal("kilometers_per_hour"));
+            tempCloseApproachData.setMissDistance(new BigDecimal(resultCloseApproachData.getJSONObject(index).getJSONObject("miss_distance").getDouble("kilometers")));
+            tempCloseApproachData.setRelativeVelocity(new BigDecimal(resultCloseApproachData.getJSONObject(index).getJSONObject("relative_velocity").getDouble("kilometers_per_hour")));
             closeApproachDataList.add(tempCloseApproachData);
         }
         tempAsteroid.setCloseApproachData(closeApproachDataList);

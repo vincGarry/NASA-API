@@ -33,7 +33,7 @@ public class NASAApiDBController {
     public ResponseEntity<List<Asteroid>> getTenClosestAsteroidsAndSaveDataToDb(@RequestBody RequestData requestData) {
         List<Asteroid> getAsteroidsTenClosestAsteroids = new ArrayList<>();
         try{
-            getAsteroidsTenClosestAsteroids.addAll(getAsteroids.getTenClosestAsteroids(requestData.getStartDate(), requestData.getEndDate()));
+            getAsteroidsTenClosestAsteroids.addAll(getAsteroids.getTenClosestAsteroids(requestData.getStartDate(), requestData.getEndDate(),null));
             dataBaseProcess.InsertAsteroidsData(getAsteroidsTenClosestAsteroids);
         } catch(Exception e){
             e.printStackTrace();
@@ -50,7 +50,7 @@ public class NASAApiDBController {
         List<Asteroid> getTenClosestAsteroids = new ArrayList<>();
         try{
             getTenClosestAsteroids.addAll(dataBaseProcess.getAllAsteroidsFromDB());
-            getTenClosestAsteroids = getAsteroids.sortAsteroidByDistance(getTenClosestAsteroids);
+            getTenClosestAsteroids = getAsteroids.sortAsteroidByDistance(getTenClosestAsteroids,null);
         } catch(Exception e){
             e.printStackTrace();
         }

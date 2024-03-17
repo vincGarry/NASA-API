@@ -61,8 +61,6 @@ public class DatabaseProcesses {
         closeApproachDataRepository.saveAllAndFlush(closeApproachDataList);
     }
     @Transactional
-
-
     public List<Asteroid> getAllAsteroidsFromDB(){
         // Get All Asteroid Data From Database and parsing it into Object Using stream
        return asteroidRepository.findAll().stream().map(tbAsteroid->{

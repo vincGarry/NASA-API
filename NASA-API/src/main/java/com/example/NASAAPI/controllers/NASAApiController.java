@@ -2,6 +2,7 @@ package com.example.NASAAPI.controllers;
 
 
 import com.example.NASAAPI.controllers.models.RequestData;
+import com.example.NASAAPI.controllers.models.RequestDataDistance;
 import com.example.NASAAPI.services.GetAsteroids;
 import com.example.NASAAPI.services.models.Asteroid;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,13 +31,29 @@ public class NASAApiController {
     public ResponseEntity<List<Asteroid>> getTenClosestAsteroids(@RequestBody RequestData requestData) {
         List<Asteroid> getAsteroidsTenClosestAsteroids = new ArrayList<>();
         try{
-            getAsteroidsTenClosestAsteroids.addAll(getAsteroids.getTenClosestAsteroids(requestData.getStartDate(), requestData.getEndDate()));
+            getAsteroidsTenClosestAsteroids.addAll(getAsteroids.getTenClosestAsteroids(requestData.getStartDate(), requestData.getEndDate(),null));
         } catch(Exception e){
             e.printStackTrace();
         }
         MDC.clear();
         return ResponseEntity.ok().body(getAsteroidsTenClosestAsteroids);
     }
+
+    @PostMapping("/getTenClosestAsteroidsByDistance")
+    @ApiResponses(
+            @ApiResponse(
+                    responseCode = "200", description = "Success"))
+    public ResponseEntity<List<Asteroid>> getAsteroidByDistance(@RequestBody RequestDataDistance requestDataDistance) {
+        List<Asteroid> getAsteroidsTenClosestAsteroids = new ArrayList<>();
+        try{
+            getAsteroidsTenClosestAsteroids.addAll(getAsteroids.getTenClosestAsteroids(requestDataDistance.getStartDate(), requestDataDistance.getEndDate(),requestDataDistance.getDistance()));
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+        MDC.clear();
+        return ResponseEntity.ok().body(getAsteroidsTenClosestAsteroids);
+    }
+
     @PostMapping("/getSpecificAsteroidById")
     @ApiResponses(
             @ApiResponse(
