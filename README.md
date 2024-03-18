@@ -1,9 +1,9 @@
 # NASA API
 
 ### This API and services are  used to retrieve and inspect near earth objects (NEO) data from NASA Open API
-
+### Architecture Flow Diagram [here](https://app.diagrams.net/?src=about#G1jgInox3ippqSc9rPNuRaWUjG7zunofdo)
 This application requires:
-- OpenJDK 17 or up
+- OpenJDK 17 or above
 - API Key from  NASA Open API (https://api.nasa.gov/)
 
 
